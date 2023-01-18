@@ -55,8 +55,13 @@ function createSession({_id, username}){
 
 };
 
+function verifyToken(token){
+    return jwt.verify(token, JWT_S);
+}
+
 module.exports = {
     register,
     login,
-    logout
+    logout,
+    verifyToken
 }
