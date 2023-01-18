@@ -5,7 +5,7 @@ const User = require('../models/User');
 const JWT_S = 'rx7HyHok9GzE0XAMNdRhrSiBV87bOCgM8VCOB084E7M';
 
 async function register (email, username, unhasedpassword){
-    const existing = await User.findOne({email});
+    const existing = await User.findOne({email}).collation({locale: 'en', strength: 2});;
 
     if(existing){
         throw new Error('Email already exists!');
@@ -21,8 +21,21 @@ async function register (email, username, unhasedpassword){
 };
 
 
-async function login (){
+async function login (email,username,password){
+    const user = await User.findOne({email, username}).collation({locale: 'en', strength: 2});
 
+    if(!user){
+        throw  new Error('Incorrect username or email!');
+    };
+
+    const hasMatch = await bcrypt.compare(password, user.password);
+
+    if(hasMatch == false){
+        throw new Error("Wrong passwprd!")
+    };
+
+    const token = createSession(user);
+    return token;
 };
 
 
