@@ -2,7 +2,7 @@ const {verifyToken} = require('../services/userServices')
 
 module.exports = () => (req, res, next) => {
 
-    const token = req.cookie['token'];
+    const token = req.cookies.token;
     if(token){
         try {
             const userData = verifyToken(token);
