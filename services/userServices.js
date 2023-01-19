@@ -5,10 +5,16 @@ const User = require('../models/User');
 const JWT_S = 'rx7HyHok9GzE0XAMNdRhrSiBV87bOCgM8VCOB084E7M';
 
 async function register (email, username, unhasedpassword){
-    const existing = await User.findOne({email}).collation({locale: 'en', strength: 2});;
+    const existingEmail = await User.findOne({email}).collation({locale: 'en', strength: 2});;
 
-    if(existing){
+    if(existingEmail){
         throw new Error('Email already exists!');
+    }
+
+    const existingUsername = await User.findOne({username}).collation({locale: 'en', strength: 2});;
+
+    if(existingUsername){
+        throw new Error('Username already exists!');
     }
 
     let password = await bcrypt.hash(unhasedpassword, 10);
@@ -21,11 +27,11 @@ async function register (email, username, unhasedpassword){
 };
 
 
-async function login (email,username,password){
-    const user = await User.findOne({email, username}).collation({locale: 'en', strength: 2});
+async function login (email,password){
+    const user = await User.findOne({email}).collation({locale: 'en', strength: 2});
 
     if(!user){
-        throw  new Error('Incorrect username or email!');
+        throw  new Error('Incorrect email or password!');
     };
 
     const hasMatch = await bcrypt.compare(password, user.password);
@@ -44,9 +50,10 @@ async function logout (){
 };
 
 
-function createSession({_id, username}){
+function createSession({_id,email, username}){
     const payload = {
         _id,
+        email,
         username
     };
 
