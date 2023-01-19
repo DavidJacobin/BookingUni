@@ -25,12 +25,20 @@ authController.post('/register', async (req, res) => {
         if (req.body.password != req.body.rePassword){
             throw new Error('Passwords must match!')
         }
+
+        if (req.body.password.length <5 ){
+            throw new Error('Passwords must be at least 5 characters!')
+        }
         const token = await register(req.body.email, req.body.username, req.body.password)
         
         res.cookie('token', token);
         res.redirect('/')
     } catch (error) {
         const errors = errorParser(error);
+        res.render('register',{
+            title: "Register Page",
+            errors
+        })
     }
 });
 
