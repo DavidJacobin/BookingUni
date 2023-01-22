@@ -18,20 +18,19 @@ hotelController.post('/create', async(req, res) =>{
         city: req.body.city,
         imageUrl: req.body.imageUrl,
         rooms: Number(req.body.rooms),
-        bookings: req.body.bookings,
         owner: req.user._id,
     };
 
     try {
          await create(hotel);
-        res.redirect('/')
+        res.redirect('/');
         
     } catch (err) {
-        res.redirect('/create', {
+        res.render('create', {
             title: "Create Hotel",
             body: hotel,
             errors: errorParser(err)
-        })
+        });
     }
 });
 
