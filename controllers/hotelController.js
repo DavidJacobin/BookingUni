@@ -3,19 +3,26 @@ const { errorParser } = require('../util/parser');
 
 const hotelController = require('express').Router();
 
-hotelController.get('/:id/details', async (req, res) =>{
+hotelController.get('/:id/details', async (req, res) => {
     const hotel = await getById(req.params.id)
+
+
+    if (req.user) {
+        if (hotel.owner == req.user._id) {
+            hotel.isOwner = true
+        }
+    }
     res.render('details', {
         hotel
     });
 });
 
-hotelController.get('/create', (req, res) =>{
+hotelController.get('/create', (req, res) => {
     res.render('create')
 });
 
 
-hotelController.post('/create', async(req, res) =>{
+hotelController.post('/create', async (req, res) => {
     const hotel = {
         name: req.body.name,
         city: req.body.city,
@@ -27,7 +34,7 @@ hotelController.post('/create', async(req, res) =>{
     try {
         await create(hotel);
         res.redirect('/');
-        
+
     } catch (err) {
         res.render('create', {
             title: "Create Hotel",
@@ -37,14 +44,15 @@ hotelController.post('/create', async(req, res) =>{
     }
 });
 
-hotelController.get('/:id/edit', async (req, res) =>{
+hotelController.get('/:id/edit', async (req, res) => {
     const hotel = await getById(req.params.id)
+
     res.render('edit', {
         hotel
     });
 });
 
-hotelController.post('/:id/edit', async(req, res) =>{
+hotelController.post('/:id/edit', async (req, res) => {
     const hotel = {
         name: req.body.name,
         city: req.body.city,
@@ -53,10 +61,14 @@ hotelController.post('/:id/edit', async(req, res) =>{
         owner: req.user._id,
     };
 
+    if (hotel.owner != req.user._id) {
+        res.redirect('/')
+    }
+
     try {
-        await updateById(req.params.id,hotel);
+        await updateById(req.params.id, hotel);
         res.redirect('/');
-        
+
     } catch (err) {
         res.render('create', {
             title: "Edit Hotel",
@@ -66,7 +78,12 @@ hotelController.post('/:id/edit', async(req, res) =>{
     }
 });
 
-hotelController.get('/:id/delete', async(req, res) =>{
+hotelController.get('/:id/delete', async (req, res) => {
+    const hotel = await getById(req.params.id)
+
+    if (hotel.owner != req.user._id) {
+        res.redirect('/')
+    }
     await deleteById(req.params.id)
     res.redirect('/')
 });
