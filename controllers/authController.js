@@ -43,12 +43,13 @@ authController.post('/register', async (req, res) => {
 });
 
 authController.get('/login', (req, res) =>{
-    res.render('login')
+    res.render('login',{
+        title: 'Login Page' });
 });
 
 authController.post('/login',async (req, res) => {
     try {
-        const token = await login(req.body.email ,req.body.username, req.body.password);
+        const token = await login(req.body.email, req.body.password);
 
         res.cookie('token', token);
         res.redirect('/')

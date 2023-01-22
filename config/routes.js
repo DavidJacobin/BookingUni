@@ -8,5 +8,5 @@ module.exports = (app) => {
     app.use('/', homeController);
     app.use('/auth', authController);
     app.use('/hotel', hotelController);
-    app.use('/profile', profileController);
+    app.use('/home', profileController);
 };
